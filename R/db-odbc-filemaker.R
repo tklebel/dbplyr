@@ -37,8 +37,30 @@ sql_select.FileMaker <- function(con, select, from,
 #' @export
 sql_translate_env.FileMaker <- function(con) {
   sql_variant(
-    sql_translator(.parent = base_odbc_scalar),
-    sql_translator(.parent = base_odbc_agg),
+    sql_translator(.parent = base_odbc_scalar,
+
+                   as.character  = sql_prefix("STRVAL"),
+                   as.Date       = sql_prefix("DATEVAL"),
+                   as.numeric    = sql_prefix("NUMVAL"),
+
+                   Sys.Date      = sql_prefix("DATE"),
+
+                   ceiling       = sql_prefix("CEILING"),
+                   exp           = sql_prefix("EXP"),
+                   floor         = sql_prefix("FLOOR"),
+                   log           = sql_prefix("LOG"),
+                   sqrt          = sql_prefix("SQRT"),
+                   abs           = sql_prefix("ABS")),
+
+
+    sql_translator(.parent = base_odbc_agg,
+
+                   mean          = sql_prefix("AVG"),
+                   sd            = sql_prefix("STDEV"),
+                   var           = sql_prefix("VAR"),
+                   max           = sql_prefix("MAX"),
+                   min           = sql_prefix("MIN"),
+                   sum           = sql_prefix("SUM")),
 
     # Window functions not supported in Filemaker
     sql_translator(.parent = base_no_win)
