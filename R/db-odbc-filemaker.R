@@ -18,6 +18,8 @@ sql_select.FileMaker <- function(con, select, from,
 
     if (distinct) sql("DISTINCT "),
 
+    # Todo: limiting the query works differently than in base SQL
+
     escape(select, collapse = ", ", con = con)
   )
 
