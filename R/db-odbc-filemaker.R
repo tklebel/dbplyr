@@ -6,9 +6,9 @@ sql_select.FileMaker <- function(con, select, from,
                               having = NULL, order_by = NULL,
                               limit = NULL,  distinct = FALSE, ...) {
 
-  out <- vector("list", 7)
+  out <- vector("list", 8)
   names(out) <- c("select",  "from",   "where",
-                  "group_by","having", "order_by", "limit")
+                  "group_by","having", "order_by", "limit", "head")
 
   assert_that(is.character(select), length(select) > 0L)
 
@@ -18,8 +18,6 @@ sql_select.FileMaker <- function(con, select, from,
 
     if (distinct) sql("DISTINCT "),
 
-    # Todo: limiting the query works differently than in base SQL
-
     escape(select, collapse = ", ", con = con)
   )
 
@@ -28,6 +26,12 @@ sql_select.FileMaker <- function(con, select, from,
   out$group_by  <- sql_clause_group_by(group_by, con)
   out$having    <- sql_clause_having(having, con)
   out$order_by  <- sql_clause_order_by(order_by, con)
+  out$head      <- build_sql(
+    if (!is.null(limit) && !identical(limit, Inf)) {
+
+      assert_that(is.numeric(limit), length(limit) == 1L, limit > 0)
+      build_sql("FETCH FIRST ", as.integer(limit), " ROWS ONLY")}
+  )
 
 
   escape(unname(compact(out)), collapse = "\n", parens = FALSE, con = con)
